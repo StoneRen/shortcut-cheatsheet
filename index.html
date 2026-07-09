@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>快捷键速查 · WezTerm · tmux · Neovim</title>
+<style>
+  :root {
+    --bg: #1a1b26; --bg-alt: #16161e; --bg-soft: #1f2335; --bg-hover: #24283b;
+    --text: #c0caf5; --text-dim: #9aa5ce; --text-mute: #565f89;
+    --border: #2a2e44; --border-soft: #21262f;
+    --accent: #7aa2f7; --accent-2: #bb9af7;
+    --green: #9ece6a; --cyan: #7dcfff; --orange: #ff9e64; --red: #f7768e; --yellow: #e0af68;
+    --kbd-bg: #2f334d; --kbd-border: #3b4156; --kbd-text: #c0caf5;
+    --spc-bg: linear-gradient(135deg,#7aa2f7,#bb9af7);
+    --warn-bg: rgba(255,158,100,.10); --warn-border: #ff9e64;
+  }
+  [data-theme="light"] {
+    --bg: #f5f6fb; --bg-alt: #fff; --bg-soft: #eef0f7; --bg-hover: #e6e9f5;
+    --text: #2b3145; --text-dim: #51587a; --text-mute: #8a90a8;
+    --border: #d9deea; --border-soft: #e7eaf2;
+    --accent: #2d5cf6; --accent-2: #8b5cf6;
+    --green: #2e8b57; --cyan: #0a8fc4; --orange: #d2691e; --red: #d83958; --yellow: #b07d18;
+    --kbd-bg: #fff; --kbd-border: #c3c9da; --kbd-text: #2b3145;
+    --spc-bg: linear-gradient(135deg,#2d5cf6,#8b5cf6);
+    --warn-bg: rgba(210,105,30,.08); --warn-border: #d2691e;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",Roboto,Helvetica,Arial,sans-serif;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  a{color:var(--accent);text-decoration:none}
+
+  header.topbar{position:sticky;top:0;z-index:50;backdrop-filter:blur(12px);background:color-mix(in srgb,var(--bg) 82%,transparent);border-bottom:1px solid var(--border)}
+  .topbar-inner{max-width:1280px;margin:0 auto;padding:12px 22px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:12px;min-width:0}
+  .brand .logo{width:38px;height:38px;border-radius:10px;background:var(--spc-bg);display:grid;place-items:center;font-size:20px;color:#fff;flex:none}
+  .brand h1{font-size:17px;margin:0;font-weight:700}
+  .brand .sub{font-size:12px;color:var(--text-mute)}
+  .tabs{display:flex;gap:4px;background:var(--bg-soft);border:1px solid var(--border);border-radius:10px;padding:3px}
+  .tab{border:none;background:transparent;color:var(--text-dim);padding:6px 14px;border-radius:7px;font-size:13.5px;font-weight:600;cursor:pointer;transition:all .15s}
+  .tab.active{background:var(--accent);color:#fff;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+  .spacer{flex:1 1 auto}
+  .search{position:relative;flex:1 1 280px;max-width:380px;min-width:160px}
+  .search input{width:100%;background:var(--bg-soft);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:9px 56px 9px 32px;font-size:14px;outline:none}
+  .search input:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
+  .search .icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-mute);font-size:13px}
+  .icon-btn{background:var(--bg-soft);border:1px solid var(--border);color:var(--text-dim);border-radius:10px;width:38px;height:38px;display:grid;place-items:center;cursor:pointer;font-size:16px;flex:none}
+  .icon-btn:hover{color:var(--accent);border-color:var(--accent)}
+
+  .layout{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:220px minmax(0,1fr);gap:28px;padding:24px 22px 80px}
+  @media(max-width:900px){.layout{grid-template-columns:1fr;padding:18px 16px 80px}nav.sidebar{position:static!important;max-height:none!important}}
+  nav.sidebar{position:sticky;top:78px;align-self:start;max-height:calc(100vh - 96px);overflow-y:auto;padding-right:6px}
+  nav.sidebar::-webkit-scrollbar{width:6px}nav.sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:6px}
+  .nav-item{display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:8px;color:var(--text-dim);font-size:13.5px;cursor:pointer;border-left:2px solid transparent;transition:all .12s}
+  .nav-item:hover{background:var(--bg-soft);color:var(--text)}
+  .nav-item.active{color:var(--accent);border-left-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent)}
+  .nav-item .ico{width:18px;text-align:center;flex:none}
+  .nav-item .label{flex:1 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .nav-item .count{font-size:11px;color:var(--text-mute);background:var(--bg-soft);border-radius:20px;padding:1px 7px;flex:none}
+  .nav-item.hidden{display:none}
+
+  main{min-width:0}
+  .intro{background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 12%,var(--bg-soft)),color-mix(in srgb,var(--accent-2) 12%,var(--bg-soft)));border:1px solid var(--border);border-radius:14px;padding:16px 20px;margin-bottom:20px;font-size:13.5px;color:var(--text-dim)}
+  .intro b{color:var(--text)}
+  .intro code{background:var(--bg-soft);padding:1px 6px;border-radius:5px;font-family:"SF Mono",Menlo,monospace;color:var(--text)}
+  .warn{background:var(--warn-bg);border:1px solid var(--warn-border);border-left-width:3px;border-radius:8px;padding:10px 14px;margin:10px 0;font-size:13px;color:var(--text-dim)}
+  .warn b{color:var(--orange)}
+  .warn code{background:var(--bg-soft);padding:1px 5px;border-radius:4px;font-family:"SF Mono",Menlo,monospace;color:var(--text)}
+
+  section.cat{margin-bottom:32px;scroll-margin-top:84px}
+  section.cat.hidden{display:none}
+  .cat-head{display:flex;align-items:center;gap:10px;margin:0 0 10px;padding-bottom:8px;border-bottom:1px solid var(--border-soft)}
+  .cat-head .emoji{font-size:18px}
+  .cat-head h2{font-size:16px;margin:0;font-weight:700}
+  .cat-head .cnt{color:var(--text-mute);font-size:12px;font-weight:400}
+
+  table{width:100%;border-collapse:collapse}
+  tbody tr{border-bottom:1px solid var(--border-soft)}
+  tbody tr:last-child{border-bottom:none}
+  tbody tr:hover{background:var(--bg-soft)}
+  tbody tr.hidden{display:none}
+  td{padding:9px 12px;vertical-align:middle}
+  td.keys{white-space:normal;width:32%}
+  td.src{width:64px;text-align:center}
+  td.desc{color:var(--text);font-weight:500;width:30%;font-family:"SF Mono",Menlo,monospace;font-size:13px}
+  td.note{color:var(--text-dim);font-size:13.5px}
+
+  kbd{display:inline-block;background:var(--kbd-bg);color:var(--kbd-text);border:1px solid var(--kbd-border);border-bottom-width:2px;border-radius:6px;padding:1px 7px;margin:0 2px 2px 0;font-family:"SF Mono","JetBrains Mono",Menlo,monospace;font-size:12px;line-height:1.7;min-width:18px;text-align:center}
+  kbd.mod{border-color:var(--accent);color:var(--accent)}
+  kbd.spc{background:var(--spc-bg);color:#fff;border-color:transparent;font-weight:700}
+  .plus{color:var(--text-mute);margin:0 1px;font-size:11px}
+  .src-badge{display:inline-block;font-size:10.5px;font-family:"SF Mono",Menlo,monospace;border:1px solid var(--border);border-radius:5px;padding:1px 6px;line-height:1.5}
+  .src-badge.custom{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 40%,transparent);background:color-mix(in srgb,var(--accent) 10%,transparent)}
+  .src-badge.def{color:var(--text-mute)}
+
+  .empty{text-align:center;color:var(--text-mute);padding:50px 20px;display:none}
+  footer{max-width:1280px;margin:0 auto;padding:26px 22px 40px;color:var(--text-mute);font-size:12.5px;border-top:1px solid var(--border-soft)}
+  footer code{background:var(--bg-soft);padding:2px 6px;border-radius:5px;font-family:"SF Mono",Menlo,monospace;color:var(--text-dim)}
+  /* nvim: mode badges + legend + kbd-hint */
+  .legend{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:12px}
+  .legend span{display:inline-flex;align-items:center;gap:6px;color:var(--text-mute);font-size:12.5px}
+  .badge{display:inline-block;font-size:10.5px;font-family:"SF Mono",Menlo,monospace;background:var(--bg-soft);color:var(--text-dim);border:1px solid var(--border);border-radius:5px;padding:1px 5px;line-height:1.5;white-space:nowrap}
+  .badge.n{color:var(--accent)} .badge.x{color:var(--accent-2)} .badge.i{color:var(--green)} .badge.v{color:var(--accent-2)} .badge.o{color:var(--cyan)} .badge.c{color:var(--orange)} .badge.t{color:var(--green)} .badge.s{color:var(--yellow)}
+  td.mode{width:64px;text-align:center}
+  .kbd-hint{position:absolute;right:9px;top:50%;transform:translateY(-50%);color:var(--text-mute);font-size:11px;pointer-events:none}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="logo">⌨</div>
+      <div>
+        <h1>终端快捷键速查</h1>
+        <div class="sub" id="sub">WezTerm · macOS</div>
+      </div>
+    </div>
+    <div class="tabs">
+      <button class="tab active" data-tool="wezterm">WezTerm</button>
+      <button class="tab" data-tool="tmux">tmux</button>
+      <button class="tab" data-tool="nvim">Neovim</button>
+    </div>
+    <div class="spacer"></div>
+    <div class="search">
+      <span class="icon">🔍</span>
+      <input id="search" type="text" placeholder="搜索快捷键 / 描述 / 说明 …" autocomplete="off" />
+      <span class="kbd-hint">按 / 聚焦</span>
+    </div>
+    <button class="icon-btn" id="theme" title="切换主题">🌙</button>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" id="nav"></nav>
+  <main>
+    <div id="intro"></div>
+    <div id="sections"></div>
+    <div class="empty" id="empty">没有匹配的快捷键 😢</div>
+  </main>
+</div>
+
+<footer>
+  数据来源：WezTerm（<code>wezterm show-keys</code> + <code>wezterm.lua</code>）、tmux（<code>tmux -f /dev/null list-keys -T prefix</code>，已回归默认）、Neovim（LazyVim <code>~/.config/nvim</code> 已启用插件 keymap）。
+  所有快捷键均通过读取本地配置文件生成，详见 <code>AGENTS.md</code>。
+</footer>
+
+<script>
+const INTRO = {
+  wezterm: `<div class="intro">
+    基于本地 <b>wezterm.lua</b> 配置（自定义键）+ WezTerm 默认键（macOS）。
+    <code>Cmd</code>=⌘ <code>Shift</code>=⇧ <code>Ctrl</code>=⌃ <code>Alt</code>=⌥。
+    自定义键多在 <code>Cmd+Shift</code> 组合上，与 vim 的 hjkl 移动方式一致。
+    <code>Cmd+Shift+D</code> 会智能判断：在 tmux 里发 <code>Ctrl-b d</code> detach（tmux 现为默认前缀 C-b，可正常 detach），否则关闭当前 pane（带确认）。
+  </div>`,
+  tmux: `<div class="intro">
+    <b>tmux.conf 已回归默认</b>（仅保留 <code>set -g mouse on</code> 与 <code>default-terminal</code>，自定义键已全部注释）。
+    <b>前缀 = <code>C-b</code></b>（tmux 原生默认）。用法：按下 <code>C-b</code> 松开，再按功能键；<code>C-b C-b</code> 发送字面 <code>Ctrl-b</code> 给程序。
+  </div>`,
+  nvim: `<div class="intro">
+    基于 <b>LazyVim</b> 默认配置 + 本地自定义（透明 tokyonight、自动换行等）。
+    <code>&lt;leader&gt;</code> = <b>空格键 (Space)</b>，<code>&lt;localleader&gt;</code> = <b>&#92;</b>。
+    大部分快捷键来源于 LazyVim，使用 <b>snacks.nvim</b> 作为 picker / explorer，<b>blink.cmp</b> 补全，<b>claudecode.nvim</b> 提供 AI。
+    <div class="legend">
+      <span><b class="badge n">n</b> 普通</span>
+      <span><b class="badge x">x</b> 可视</span>
+      <span><b class="badge v">v</b> 可视行</span>
+      <span><b class="badge i">i</b> 插入</span>
+      <span><b class="badge o">o</b> 待决</span>
+      <span><b class="badge c">c</b> 命令行</span>
+      <span><b class="badge t">t</b> 终端</span>
+      <span><b class="badge s">s</b> 选择</span>
+    </div>
+  </div>`
+};
+
+const DATA = {
+  wezterm: [
+    { id:"wt-custom", icon:"⭐", title:"自定义键（来自 wezterm.lua）", items:[
+      {src:"custom", key:"Cmd+Shift+|", desc:"SplitHorizontal", note:"左右分屏（新 pane 在右侧）"},
+      {src:"custom", key:"Cmd+Shift+-", desc:"SplitVertical", note:"上下分屏（新 pane 在下方）"},
+      {src:"custom", key:"Cmd+Shift+D", desc:"Smart Close", note:"智能关闭：检测到 tmux 则发 Ctrl-b d detach 保留会话，否则关闭当前 pane（带确认）"},
+      {src:"custom", key:"Cmd+Shift+H", desc:"ActivatePane Left", note:"跳到左 pane"},
+      {src:"custom", key:"Cmd+Shift+L", desc:"ActivatePane Right", note:"跳到右 pane"},
+      {src:"custom", key:"Cmd+Shift+K", desc:"ActivatePane Up", note:"跳到上 pane"},
+      {src:"custom", key:"Cmd+Shift+J", desc:"ActivatePane Down", note:"跳到下 pane"},
+      {src:"custom", key:"Cmd+Shift+Left", desc:"ActivatePane Left", note:"方向键跳到左 pane"},
+      {src:"custom", key:"Cmd+Shift+Right", desc:"ActivatePane Right", note:"方向键跳到右 pane"},
+      {src:"custom", key:"Cmd+Shift+Up", desc:"ActivatePane Up", note:"方向键跳到上 pane"},
+      {src:"custom", key:"Cmd+Shift+Down", desc:"ActivatePane Down", note:"方向键跳到下 pane"},
+      {src:"custom", key:"Shift+Enter", desc:"Send Shift+Enter", note:"修复 claude code 中 Shift+Enter 换行（发送特殊转义序列）"},
+    ]},
+    { id:"wt-tab", icon:"🗂️", title:"默认 · 标签页与窗口", items:[
+      {src:"def", key:"Cmd+T", desc:"SpawnTab", note:"新建标签页"},
+      {src:"def", key:"Cmd+W", desc:"CloseCurrentTab", note:"关闭当前标签页（带确认）"},
+      {src:"def", key:"Cmd+N", desc:"SpawnWindow", note:"新建窗口"},
+      {src:"def", key:"Cmd+1", desc:"ActivateTab(0)", note:"跳到第 1 个标签（Cmd+1..9，9=最后一个）"},
+      {src:"def", key:"Cmd+9", desc:"ActivateTab(-1)", note:"跳到最后一个标签"},
+      {src:"def", key:"Cmd+{", desc:"ActivateTabRelative(-1)", note:"上一个标签（即 Cmd+Shift+[）"},
+      {src:"def", key:"Cmd+}", desc:"ActivateTabRelative(1)", note:"下一个标签（即 Cmd+Shift+]）"},
+      {src:"def", key:"Cmd+Q", desc:"QuitApplication", note:"退出 WezTerm"},
+    ]},
+    { id:"wt-font", icon:"🔤", title:"默认 · 字体与显示", items:[
+      {src:"def", key:"Cmd+=", desc:"IncreaseFontSize", note:"放大字体"},
+      {src:"def", key:"Cmd+-", desc:"DecreaseFontSize", note:"缩小字体"},
+      {src:"def", key:"Cmd+0", desc:"ResetFontSize", note:"重置字体大小"},
+      {src:"def", key:"Cmd+K", desc:"ClearScrollback", note:"清空回滚缓冲"},
+      {src:"def", key:"Alt+Enter", desc:"ToggleFullScreen", note:"全屏切换"},
+      {src:"def", key:"Ctrl+Shift+Z", desc:"TogglePaneZoom", note:"当前 pane 缩放（最大化/还原）"},
+    ]},
+    { id:"wt-copy", icon:"📋", title:"默认 · 复制 / 粘贴 / 搜索", items:[
+      {src:"def", key:"Cmd+C", desc:"CopyTo Clipboard", note:"复制选区（选中也会自动复制）"},
+      {src:"def", key:"Cmd+V", desc:"PasteFrom Clipboard", note:"粘贴"},
+      {src:"def", key:"Cmd+F", desc:"Search", note:"搜索"},
+      {src:"def", key:"Ctrl+Shift+X", desc:"ActivateCopyMode", note:"进入复制/查看模式（vi 风格）"},
+      {src:"def", key:"Ctrl+Shift+U", desc:"CharSelect", note:"字符选择（输入 Unicode / emoji）"},
+      {src:"def", key:"Ctrl+Shift+P", desc:"CommandPalette", note:"命令面板"},
+    ]},
+    { id:"wt-cm", icon:"📝", title:"复制模式内（Ctrl+Shift+X 进入，vi 风格）", items:[
+      {src:"def", key:"h", desc:"MoveLeft", note:"左移"},
+      {src:"def", key:"j", desc:"MoveDown", note:"下移"},
+      {src:"def", key:"k", desc:"MoveUp", note:"上移"},
+      {src:"def", key:"l", desc:"MoveRight", note:"右移"},
+      {src:"def", key:"w", desc:"MoveForwardWord", note:"下一个词"},
+      {src:"def", key:"b", desc:"MoveBackwardWord", note:"上一个词"},
+      {src:"def", key:"0", desc:"MoveToStartOfLine", note:"行首"},
+      {src:"def", key:"$", desc:"MoveToEndOfLine", note:"行尾"},
+      {src:"def", key:"g", desc:"ScrollbackTop", note:"回滚顶部"},
+      {src:"def", key:"G", desc:"ScrollbackBottom", note:"回滚底部"},
+      {src:"def", key:"Ctrl+u", desc:"MoveByPage -0.5", note:"上翻半页"},
+      {src:"def", key:"Ctrl+d", desc:"MoveByPage 0.5", note:"下翻半页"},
+      {src:"def", key:"Ctrl+b", desc:"PageUp", note:"上翻整页"},
+      {src:"def", key:"Ctrl+f", desc:"PageDown", note:"下翻整页"},
+      {src:"def", key:"v", desc:"SetSelectionMode Cell", note:"字符选择"},
+      {src:"def", key:"V", desc:"SetSelectionMode Line", note:"行选择"},
+      {src:"def", key:"Ctrl+v", desc:"SetSelectionMode Block", note:"块选择"},
+      {src:"def", key:"y", desc:"Copy & Close", note:"复制到剪贴板并退出"},
+      {src:"def", key:"Esc", desc:"Close", note:"退出复制模式"},
+      {src:"def", key:"f", desc:"JumpForward", note:"跳到指定字符（f+x）"},
+      {src:"def", key:"F", desc:"JumpBackward", note:"反向跳字符"},
+    ]},
+    { id:"wt-other", icon:"⚙️", title:"默认 · 其它", items:[
+      {src:"def", key:"Cmd+R", desc:"ReloadConfiguration", note:"重新加载配置"},
+      {src:"def", key:"Cmd+H", desc:"HideApplication", note:"隐藏应用"},
+      {src:"def", key:"Cmd+M", desc:"Hide", note:"最小化"},
+      {src:"def", key:"Ctrl+Shift+L", desc:"ShowDebugOverlay", note:"调试浮层"},
+      {src:"def", key:"PageUp", desc:"Scroll Up", note:"向上滚动回滚"},
+      {src:"def", key:"PageDown", desc:"Scroll Down", note:"向下滚动回滚"},
+    ]},
+  ],
+  tmux: [
+    { id:"tm-session", icon:"🎯", title:"会话 Session", items:[
+      {src:"def", key:"C-b d", desc:"detach-client", note:"detach 会话（后台保留）"},
+      {src:"def", key:"C-b s", desc:"choose-tree -Zs", note:"会话列表选择"},
+      {src:"def", key:"C-b $", desc:"rename-session", note:"重命名会话"},
+      {src:"def", key:"C-b (", desc:"switch-client -p", note:"上一个会话"},
+      {src:"def", key:"C-b )", desc:"switch-client -n", note:"下一个会话"},
+      {src:"def", key:"C-b L", desc:"switch-client -l", note:"切到上一个会话"},
+      {src:"def", key:"C-b D", desc:"choose-client -Z", note:"选择客户端"},
+    ]},
+    { id:"tm-window", icon:"🪟", title:"窗口 Window", items:[
+      {src:"def", key:"C-b c", desc:"new-window", note:"新建窗口"},
+      {src:"def", key:"C-b ,", desc:"rename-window", note:"重命名窗口"},
+      {src:"def", key:"C-b n", desc:"next-window", note:"下一个窗口"},
+      {src:"def", key:"C-b p", desc:"previous-window", note:"上一个窗口"},
+      {src:"def", key:"C-b l", desc:"last-window", note:"上一个访问的窗口"},
+      {src:"def", key:"C-b 0", desc:"select-window :=0", note:"跳到第 0 个窗口（0..9）"},
+      {src:"def", key:"C-b '", desc:"select-window (prompt)", note:"按序号选择窗口"},
+      {src:"def", key:"C-b w", desc:"choose-tree -Zw", note:"窗口列表选择"},
+      {src:"def", key:"C-b f", desc:"find-window", note:"按内容查找窗口"},
+      {src:"def", key:"C-b &", desc:"kill-window", note:"关闭窗口（确认）"},
+      {src:"def", key:"C-b .", desc:"move-window", note:"移动窗口到指定序号"},
+    ]},
+    { id:"tm-pane", icon:"🔲", title:"面板 Pane", items:[
+      {src:"def", key:"C-b %", desc:"split-window -h", note:"左右分屏（默认）"},
+      {src:"def", key:'C-b "', desc:"split-window -v", note:"上下分屏（默认）"},
+      {src:"def", key:"C-b o", desc:"select-pane :.+", note:"下一个面板"},
+      {src:"def", key:"C-b ;", desc:"last-pane", note:"上一个面板"},
+      {src:"def", key:"C-b Up", desc:"select-pane -U", note:"选上方面板"},
+      {src:"def", key:"C-b Down", desc:"select-pane -D", note:"选下方面板"},
+      {src:"def", key:"C-b Left", desc:"select-pane -L", note:"选左方面板"},
+      {src:"def", key:"C-b Right", desc:"select-pane -R", note:"选右方面板"},
+      {src:"def", key:"C-b q", desc:"display-panes", note:"显示面板编号"},
+      {src:"def", key:"C-b x", desc:"kill-pane", note:"关闭面板（确认）"},
+      {src:"def", key:"C-b z", desc:"resize-pane -Z", note:"面板最大化切换"},
+      {src:"def", key:"C-b {", desc:"swap-pane -U", note:"与上一个面板交换"},
+      {src:"def", key:"C-b }", desc:"swap-pane -D", note:"与下一个面板交换"},
+      {src:"def", key:"C-b !", desc:"break-pane", note:"面板拆成独立窗口"},
+      {src:"def", key:"C-b Space", desc:"next-layout", note:"下一种布局"},
+      {src:"def", key:"C-b M-1", desc:"even-horizontal", note:"预设布局（M-1..M-7）"},
+      {src:"def", key:"C-b M-Up", desc:"resize-pane -U 5", note:"向上调高 5（M-方向键，可重复）"},
+      {src:"def", key:"C-b M-Down", desc:"resize-pane -D 5", note:"向下调高 5"},
+      {src:"def", key:"C-b M-Left", desc:"resize-pane -L 5", note:"向左调宽 5"},
+      {src:"def", key:"C-b M-Right", desc:"resize-pane -R 5", note:"向右调宽 5"},
+      {src:"def", key:"C-b C-Up", desc:"resize-pane -U", note:"向上调高 1（C-方向键）"},
+      {src:"def", key:"C-b C-o", desc:"rotate-window", note:"轮换面板位置"},
+      {src:"def", key:"C-b m", desc:"select-pane -m", note:"标记/取消标记面板"},
+      {src:"def", key:"C-b >", desc:"display pane menu", note:"面板右键菜单"},
+      {src:"def", key:"C-b <", desc:"display window menu", note:"窗口右键菜单"},
+    ]},
+    { id:"tm-copy", icon:"📋", title:"复制 / 粘贴", items:[
+      {src:"def", key:"C-b [", desc:"copy-mode", note:"进入复制/查看模式"},
+      {src:"def", key:"C-b ]", desc:"paste-buffer -p", note:"粘贴"},
+      {src:"def", key:"C-b =", desc:"choose-buffer -Z", note:"选择缓冲区"},
+      {src:"def", key:"C-b #", desc:"list-buffers", note:"列出缓冲区"},
+      {src:"def", key:"C-b -", desc:"delete-buffer", note:"删除当前缓冲区"},
+      {src:"def", key:"C-b PPage", desc:"copy-mode -u", note:"进入复制模式并上翻"},
+    ]},
+    { id:"tm-cm", icon:"📝", title:"复制模式内（C-b [ 进入，emacs 风格默认）", items:[
+      {src:"def", key:"C-b", desc:"cursor-left", note:"左移（复制模式内 C-b=Ctrl+b，非前缀）"},
+      {src:"def", key:"C-f", desc:"cursor-right", note:"右移"},
+      {src:"def", key:"C-p", desc:"cursor-up", note:"上移"},
+      {src:"def", key:"C-n", desc:"cursor-down", note:"下移"},
+      {src:"def", key:"Up", desc:"cursor-up", note:"方向键上"},
+      {src:"def", key:"Down", desc:"cursor-down", note:"方向键下"},
+      {src:"def", key:"C-v", desc:"page-down", note:"下翻页"},
+      {src:"def", key:"M-v", desc:"page-up", note:"上翻页"},
+      {src:"def", key:"C-Space", desc:"begin-selection", note:"开始选择"},
+      {src:"def", key:"C-w", desc:"copy-pipe-and-cancel", note:"复制并退出"},
+      {src:"def", key:"M-w", desc:"copy-pipe-and-cancel", note:"复制并退出"},
+      {src:"def", key:"C-s", desc:"search-forward-incremental", note:"向下增量搜索"},
+      {src:"def", key:"C-r", desc:"search-backward-incremental", note:"向上增量搜索"},
+      {src:"def", key:"C-a", desc:"start-of-line", note:"行首（Ctrl+a，非前缀）"},
+      {src:"def", key:"C-e", desc:"end-of-line", note:"行尾"},
+      {src:"def", key:"M-b", desc:"previous-word", note:"上一个词"},
+      {src:"def", key:"M-f", desc:"next-word-end", note:"下一个词"},
+      {src:"def", key:"q", desc:"cancel", note:"退出复制模式"},
+      {src:"def", key:"Esc", desc:"cancel", note:"退出复制模式"},
+    ]},
+    { id:"tm-other", icon:"⚙️", title:"其它", items:[
+      {src:"def", key:"C-b ?", desc:"list-keys -N", note:"查看所有按键（带说明）"},
+      {src:"def", key:"C-b :", desc:"command-prompt", note:"命令行"},
+      {src:"def", key:"C-b C-b", desc:"send-prefix", note:"发送字面 Ctrl-b 给程序"},
+      {src:"def", key:"C-b t", desc:"clock-mode", note:"时钟模式"},
+      {src:"def", key:"C-b i", desc:"display-message", note:"显示信息"},
+      {src:"def", key:"C-b ~", desc:"show-messages", note:"显示消息日志"},
+      {src:"def", key:"C-b r", desc:"refresh-client", note:"刷新客户端"},
+      {src:"def", key:"C-b E", desc:"select-layout -E", note:"均分布局"},
+      {src:"def", key:"C-b C", desc:"customize-mode", note:"自定义按键模式"},
+      {src:"def", key:"C-b C-z", desc:"suspend-client", note:"挂起客户端"},
+      {src:"def", key:"C-b /", desc:"list-keys (prompt)", note:"按键查找"},
+    ]},
+  ],
+  nvim: [
+  {
+    id: "move", icon: "🧭", title: "移动 / 跳转",
+    items: [
+      { mode:"n x", key:"j / <Down>", desc:"Down", note:"按显示行向下（折行更自然）" },
+      { mode:"n x", key:"k / <Up>", desc:"Up", note:"按显示行向上" },
+      { mode:"n x o", key:"s", desc:"Flash", note:"在所有匹配处打标签，输入标签快速跳转" },
+      { mode:"n o x", key:"S", desc:"Flash Treesitter", note:"用 Treesitter 选择/跳转语法结构" },
+      { mode:"o", key:"r", desc:"Remote Flash", note:"operator 时远程跳转目标" },
+      { mode:"o x", key:"R", desc:"Treesitter Search", note:"Treesitter 范围内搜索跳转" },
+      { mode:"c", key:"<C-s>", desc:"Toggle Flash", note:"在 / 搜索时开关 Flash 标签" },
+      { mode:"n o x", key:"<C-Space>", desc:"Treesitter Incremental Selection", note:"增量选语法块，<BS> 回退" },
+      { mode:"n", key:"n", desc:"Next Search Result", note:"下一个搜索结果（保持方向）" },
+      { mode:"n", key:"N", desc:"Prev Search Result", note:"上一个搜索结果" },
+      { mode:"i n s", key:"<Esc>", desc:"Escape & Clear hlsearch", note:"退出并清除搜索高亮 / 停止 snippet" },
+      { mode:"n", key:"<leader>ur", desc:"Redraw / Clear hlsearch", note:"重绘 / 清除高亮 / diff 更新" },
+    ]
+  },
+  {
+    id: "win", icon: "🪟", title: "窗口",
+    items: [
+      { mode:"n", key:"<C-h>", desc:"Go to Left Window", note:"跳转到左窗口" },
+      { mode:"n", key:"<C-j>", desc:"Go to Lower Window", note:"跳转到下窗口" },
+      { mode:"n", key:"<C-k>", desc:"Go to Upper Window", note:"跳转到上窗口" },
+      { mode:"n", key:"<C-l>", desc:"Go to Right Window", note:"跳转到右窗口" },
+      { mode:"n", key:"<C-Up>", desc:"Increase Height", note:"增高当前窗口" },
+      { mode:"n", key:"<C-Down>", desc:"Decrease Height", note:"减低当前窗口" },
+      { mode:"n", key:"<C-Left>", desc:"Decrease Width", note:"减窄当前窗口" },
+      { mode:"n", key:"<C-Right>", desc:"Increase Width", note:"增宽当前窗口" },
+      { mode:"n", key:"<leader>-", desc:"Split Below", note:"水平分割窗口" },
+      { mode:"n", key:"<leader>|", desc:"Split Right", note:"垂直分割窗口" },
+      { mode:"n", key:"<leader>wd", desc:"Delete Window", note:"关闭当前窗口" },
+      { mode:"n", key:"<leader>wm / <leader>uZ", desc:"Toggle Zoom", note:"窗口最大化 / 还原" },
+      { mode:"n", key:"<leader>uz", desc:"Toggle Zen", note:"Zen 模式（聚焦当前窗口）" },
+      { mode:"n", key:"<C-w><space>", desc:"Window Hydra Mode", note:"which-key 窗口循环模式" },
+      { mode:"n", key:"<leader>w", desc:"+windows（组）", note:"代理 <C-w>，含 wh/wj/wk/wl/wv/ws/wo/wT 等" },
+    ]
+  },
+  {
+    id: "buf", icon: "🗂️", title: "缓冲区",
+    items: [
+      { mode:"n", key:"<S-h> / [b", desc:"Prev Buffer", note:"上一个缓冲区" },
+      { mode:"n", key:"<S-l> / ]b", desc:"Next Buffer", note:"下一个缓冲区" },
+      { mode:"n", key:"[B", desc:"Move Buffer Prev", note:"缓冲区左移" },
+      { mode:"n", key:"]B", desc:"Move Buffer Next", note:"缓冲区右移" },
+      { mode:"n", key:"<leader>bb / <leader>`", desc:"Switch to Other Buffer", note:"切换到上一个缓冲区" },
+      { mode:"n", key:"<leader>bd", desc:"Delete Buffer", note:"关闭当前缓冲区" },
+      { mode:"n", key:"<leader>bo", desc:"Delete Other Buffers", note:"关闭其它缓冲区" },
+      { mode:"n", key:"<leader>bD", desc:"Delete Buffer and Window", note:"关闭缓冲区并退出窗口" },
+      { mode:"n", key:"<leader>bp", desc:"Toggle Pin", note:"固定 / 取消固定缓冲区" },
+      { mode:"n", key:"<leader>bP", desc:"Delete Non-Pinned", note:"关闭所有未固定的缓冲区" },
+      { mode:"n", key:"<leader>br", desc:"Delete Buffers to Right", note:"关闭右侧缓冲区" },
+      { mode:"n", key:"<leader>bl", desc:"Delete Buffers to Left", note:"关闭左侧缓冲区" },
+      { mode:"n", key:"<leader>bj", desc:"Pick Buffer", note:"选择跳转到指定缓冲区" },
+    ]
+  },
+  {
+    id: "tab", icon: "📑", title: "标签页",
+    items: [
+      { mode:"n", key:"<leader><tab><tab>", desc:"New Tab", note:"新建标签页" },
+      { mode:"n", key:"<leader><tab>]", desc:"Next Tab", note:"下一个标签页" },
+      { mode:"n", key:"<leader><tab>[", desc:"Previous Tab", note:"上一个标签页" },
+      { mode:"n", key:"<leader><tab>d", desc:"Close Tab", note:"关闭标签页" },
+      { mode:"n", key:"<leader><tab>o", desc:"Close Other Tabs", note:"关闭其它标签页" },
+      { mode:"n", key:"<leader><tab>l", desc:"Last Tab", note:"最后一个标签页" },
+      { mode:"n", key:"<leader><tab>f", desc:"First Tab", note:"第一个标签页" },
+    ]
+  },
+  {
+    id: "file", icon: "📁", title: "文件 / 查找",
+    items: [
+      { mode:"n", key:"<leader><space>", desc:"Find Files (Root)", note:"查找文件（项目根目录）" },
+      { mode:"n", key:"<leader>ff", desc:"Find Files (Root)", note:"查找文件（根目录）" },
+      { mode:"n", key:"<leader>fF", desc:"Find Files (cwd)", note:"查找文件（当前目录）" },
+      { mode:"n", key:"<leader>fg", desc:"Find Files (git)", note:"查找 git 跟踪文件" },
+      { mode:"n", key:"<leader>fr", desc:"Recent", note:"最近打开的文件" },
+      { mode:"n", key:"<leader>fR", desc:"Recent (cwd)", note:"最近文件（当前目录）" },
+      { mode:"n", key:"<leader>fb", desc:"Buffers", note:"已打开缓冲区列表" },
+      { mode:"n", key:"<leader>fB", desc:"Buffers (all)", note:"全部缓冲区（含隐藏/未命名）" },
+      { mode:"n", key:"<leader>fc", desc:"Find Config File", note:"查找 Neovim 配置文件" },
+      { mode:"n", key:"<leader>fp", desc:"Projects", note:"选择项目" },
+      { mode:"n", key:"<leader>fn", desc:"New File", note:"新建文件" },
+      { mode:"n", key:"<leader>e / <leader>fe", desc:"Explorer (Root)", note:"文件浏览器（根目录）" },
+      { mode:"n", key:"<leader>E / <leader>fE", desc:"Explorer (cwd)", note:"文件浏览器（当前目录）" },
+      { mode:"n", key:"<leader>,", desc:"Buffers", note:"缓冲区列表（快速）" },
+      { mode:"n", key:"<leader>:", desc:"Command History", note:"命令历史" },
+    ]
+  },
+  {
+    id: "search", icon: "🔎", title: "搜索",
+    items: [
+      { mode:"n", key:"<leader>/", desc:"Grep (Root)", note:"全局搜索（根目录）" },
+      { mode:"n", key:"<leader>sg", desc:"Grep (Root)", note:"全局 grep（根目录）" },
+      { mode:"n", key:"<leader>sG", desc:"Grep (cwd)", note:"全局 grep（当前目录）" },
+      { mode:"n x", key:"<leader>sw", desc:"grep word (Root)", note:"搜索光标词 / 选区（根目录）" },
+      { mode:"n x", key:"<leader>sW", desc:"grep word (cwd)", note:"搜索光标词 / 选区（当前目录）" },
+      { mode:"n", key:"<leader>sb", desc:"Buffer Lines", note:"当前缓冲区内搜索" },
+      { mode:"n", key:"<leader>sB", desc:"Grep Open Buffers", note:"在所有打开的缓冲区中 grep" },
+      { mode:"n", key:"<leader>sp", desc:"Search Plugin Spec", note:"搜索插件 spec" },
+      { mode:"n", key:"<leader>sR", desc:"Resume", note:"恢复上一次搜索结果" },
+      { mode:"n", key:"<leader>sk", desc:"Keymaps", note:"查看所有快捷键" },
+      { mode:"n", key:"<leader>sh", desc:"Help Pages", note:"帮助文档搜索" },
+      { mode:"n", key:"<leader>sH", desc:"Highlights", note:"高亮组搜索" },
+      { mode:"n", key:"<leader>si", desc:"Icons", note:"图标搜索" },
+      { mode:"n", key:"<leader>sj", desc:"Jumps", note:"跳转列表" },
+      { mode:"n", key:"<leader>sm", desc:"Marks", note:"标记列表" },
+      { mode:"n", key:"<leader>sM", desc:"Man Pages", note:"man 手册搜索" },
+      { mode:"n", key:"<leader>sC", desc:"Commands", note:"命令搜索" },
+      { mode:"n", key:"<leader>sc", desc:"Command History", note:"命令历史" },
+      { mode:"n", key:"<leader>s/", desc:"Search History", note:"搜索历史" },
+      { mode:"n", key:'<leader>s"', desc:"Registers", note:"寄存器列表" },
+      { mode:"n", key:"<leader>sa", desc:"Autocmds", note:"自动命令列表" },
+      { mode:"n", key:"<leader>sl", desc:"Location List", note:"Location 列表" },
+      { mode:"n", key:"<leader>sq", desc:"Quickfix List", note:"Quickfix 列表" },
+      { mode:"n", key:"<leader>su", desc:"Undotree", note:"撤销树" },
+      { mode:"n", key:"<leader>st", desc:"Todo", note:"TODO 注释列表" },
+      { mode:"n", key:"<leader>sT", desc:"Todo/Fix/Fixme", note:"TODO/FIX/FIXME 列表" },
+      { mode:"n", key:"<leader>ss", desc:"LSP Symbols", note:"当前缓冲区符号" },
+      { mode:"n", key:"<leader>sS", desc:"LSP Workspace Symbols", note:"工作区符号" },
+    ]
+  },
+  {
+    id: "git", icon: "🌿", title: "Git",
+    items: [
+      { mode:"n", key:"<leader>gg", desc:"Lazygit (Root)", note:"打开 lazygit（根目录）" },
+      { mode:"n", key:"<leader>gG", desc:"Lazygit (cwd)", note:"打开 lazygit（当前目录）" },
+      { mode:"n", key:"<leader>gl", desc:"Git Log", note:"提交历史（根目录）" },
+      { mode:"n", key:"<leader>gL", desc:"Git Log (cwd)", note:"提交历史（当前目录）" },
+      { mode:"n", key:"<leader>gb", desc:"Git Blame Line", note:"当前行 blame" },
+      { mode:"n", key:"<leader>gf", desc:"Git Current File History", note:"当前文件历史" },
+      { mode:"n x", key:"<leader>gB", desc:"Git Browse (open)", note:"浏览器打开当前行/文件" },
+      { mode:"n x", key:"<leader>gY", desc:"Git Browse (copy)", note:"复制浏览器链接到剪贴板" },
+      { mode:"n", key:"<leader>gd", desc:"Git Diff (hunks)", note:"Git 差异（按 hunk）" },
+      { mode:"n", key:"<leader>gD", desc:"Git Diff (origin)", note:"Git 差异（对比 origin）" },
+      { mode:"n", key:"<leader>gs", desc:"Git Status", note:"Git 状态列表" },
+      { mode:"n", key:"<leader>gS", desc:"Git Stash", note:"Git stash 列表" },
+      { mode:"n", key:"<leader>gi", desc:"GitHub Issues (open)", note:"打开的 Issue" },
+      { mode:"n", key:"<leader>gI", desc:"GitHub Issues (all)", note:"全部 Issue" },
+      { mode:"n", key:"<leader>gp", desc:"GitHub PR (open)", note:"打开的 PR" },
+      { mode:"n", key:"<leader>gP", desc:"GitHub PR (all)", note:"全部 PR" },
+      { mode:"n", key:"]h", desc:"Next Hunk", note:"下一个 git hunk" },
+      { mode:"n", key:"[h", desc:"Prev Hunk", note:"上一个 git hunk" },
+      { mode:"n", key:"]H", desc:"Last Hunk", note:"最后一个 hunk" },
+      { mode:"n", key:"[H", desc:"First Hunk", note:"第一个 hunk" },
+      { mode:"n x", key:"<leader>ghs", desc:"Stage Hunk", note:"暂存 hunk" },
+      { mode:"n x", key:"<leader>ghr", desc:"Reset Hunk", note:"撤销 hunk 修改" },
+      { mode:"n", key:"<leader>ghS", desc:"Stage Buffer", note:"暂存整个缓冲区" },
+      { mode:"n", key:"<leader>ghu", desc:"Undo Stage Hunk", note:"撤销暂存 hunk" },
+      { mode:"n", key:"<leader>ghR", desc:"Reset Buffer", note:"撤销整个缓冲区" },
+      { mode:"n", key:"<leader>ghp", desc:"Preview Hunk Inline", note:"内联预览 hunk" },
+      { mode:"n", key:"<leader>ghb", desc:"Blame Line", note:"当前行完整 blame" },
+      { mode:"n", key:"<leader>ghB", desc:"Blame Buffer", note:"缓冲区 blame" },
+      { mode:"n", key:"<leader>ghd", desc:"Diff This", note:"当前 buffer 进入 diff" },
+      { mode:"n", key:"<leader>ghD", desc:"Diff This ~", note:"与上次提交 diff" },
+      { mode:"o x", key:"ih", desc:"Select Hunk", note:"选择 hunk（文本对象）" },
+    ]
+  },
+  {
+    id: "lsp", icon: "🔧", title: "LSP / 代码",
+    items: [
+      { mode:"n", key:"gd", desc:"Goto Definition", note:"跳转到定义" },
+      { mode:"n", key:"gr", desc:"References", note:"查看引用" },
+      { mode:"n", key:"gI", desc:"Goto Implementation", note:"跳转到实现" },
+      { mode:"n", key:"gy", desc:"Goto T[y]pe Definition", note:"跳转到类型定义" },
+      { mode:"n", key:"gD", desc:"Goto Declaration", note:"跳转到声明" },
+      { mode:"n", key:"K", desc:"Hover", note:"悬浮文档" },
+      { mode:"n", key:"gK", desc:"Signature Help", note:"函数签名帮助" },
+      { mode:"i", key:"<C-k>", desc:"Signature Help", note:"插入模式签名帮助" },
+      { mode:"n x", key:"<leader>ca", desc:"Code Action", note:"代码动作" },
+      { mode:"n", key:"<leader>cr", desc:"Rename", note:"重命名符号" },
+      { mode:"n", key:"<leader>cR", desc:"Rename File", note:"重命名文件（LSP）" },
+      { mode:"n", key:"<leader>cA", desc:"Source Action", note:"source action" },
+      { mode:"n", key:"<leader>co", desc:"Organize Imports", note:"整理导入" },
+      { mode:"n x", key:"<leader>cc", desc:"Run Codelens", note:"运行 codelens" },
+      { mode:"n", key:"<leader>cC", desc:"Refresh Codelens", note:"刷新并显示 codelens" },
+      { mode:"n", key:"<leader>cl", desc:"Lsp Info", note:"查看 LSP 配置信息" },
+      { mode:"n", key:"<leader>cm", desc:"Mason", note:"打开 Mason（LSP/工具管理）" },
+      { mode:"n x", key:"<leader>cf", desc:"Format", note:"格式化（强制）" },
+      { mode:"n x", key:"<leader>cF", desc:"Format Injected Langs", note:"格式化注入语言（如 markdown 代码块）" },
+      { mode:"n", key:"gai", desc:"Calls Incoming", note:"谁调用了当前函数" },
+      { mode:"n", key:"gao", desc:"Calls Outgoing", note:"当前函数调用了谁" },
+      { mode:"n", key:"]]", desc:"Next Reference", note:"下一个 LSP 引用" },
+      { mode:"n", key:"[[", desc:"Prev Reference", note:"上一个 LSP 引用" },
+      { mode:"n", key:"<A-n>", desc:"Next Reference (split)", note:"下一个引用（分屏跳转）" },
+      { mode:"n", key:"<A-p>", desc:"Prev Reference (split)", note:"上一个引用（分屏跳转）" },
+    ]
+  },
+  {
+    id: "diag", icon: "🩺", title: "诊断 / Quickfix",
+    items: [
+      { mode:"n", key:"<leader>cd", desc:"Line Diagnostics", note:"当前行诊断浮窗" },
+      { mode:"n", key:"]d", desc:"Next Diagnostic", note:"下一个诊断" },
+      { mode:"n", key:"[d", desc:"Prev Diagnostic", note:"上一个诊断" },
+      { mode:"n", key:"]e", desc:"Next Error", note:"下一个错误" },
+      { mode:"n", key:"[e", desc:"Prev Error", note:"上一个错误" },
+      { mode:"n", key:"]w", desc:"Next Warning", note:"下一个警告" },
+      { mode:"n", key:"[w", desc:"Prev Warning", note:"上一个警告" },
+      { mode:"n", key:"<leader>xx", desc:"Diagnostics (Trouble)", note:"项目诊断面板" },
+      { mode:"n", key:"<leader>xX", desc:"Buffer Diagnostics (Trouble)", note:"当前缓冲区诊断面板" },
+      { mode:"n", key:"<leader>xL", desc:"Location List (Trouble)", note:"Location 列表面板" },
+      { mode:"n", key:"<leader>xQ", desc:"Quickfix List (Trouble)", note:"Quickfix 列表面板" },
+      { mode:"n", key:"<leader>xq", desc:"Quickfix List", note:"切换 Quickfix 列表" },
+      { mode:"n", key:"<leader>xl", desc:"Location List", note:"切换 Location 列表" },
+      { mode:"n", key:"[q", desc:"Previous Quickfix", note:"上一个 quickfix 项" },
+      { mode:"n", key:"]q", desc:"Next Quickfix", note:"下一个 quickfix 项" },
+      { mode:"n", key:"<leader>cs", desc:"Symbols (Trouble)", note:"符号大纲面板" },
+      { mode:"n", key:"<leader>cS", desc:"LSP refs/defs (Trouble)", note:"LSP 引用/定义面板" },
+    ]
+  },
+  {
+    id: "todo", icon: "✅", title: "Todo 注释",
+    items: [
+      { mode:"n", key:"]t", desc:"Next Todo", note:"下一个 TODO 注释" },
+      { mode:"n", key:"[t", desc:"Previous Todo", note:"上一个 TODO 注释" },
+      { mode:"n", key:"<leader>xt", desc:"Todo (Trouble)", note:"TODO 面板" },
+      { mode:"n", key:"<leader>xT", desc:"Todo/Fix/Fixme (Trouble)", note:"TODO/FIX/FIXME 面板" },
+    ]
+  },
+  {
+    id: "term", icon: "🖥️", title: "终端",
+    items: [
+      { mode:"n", key:"<leader>ft", desc:"Terminal (Root)", note:"浮动终端（根目录）" },
+      { mode:"n", key:"<leader>fT", desc:"Terminal (cwd)", note:"浮动终端（当前目录）" },
+      { mode:"n t", key:"<C-/>", desc:"Terminal (Root)", note:"聚焦 / 切换终端" },
+      { mode:"n t", key:"<C-_>", desc:"Terminal (Root)", note:"同上（兼容键）" },
+      { mode:"t", key:"<C-h>", desc:"Go to Left Window", note:"终端内跳左窗口" },
+      { mode:"t", key:"<C-j>", desc:"Go to Lower Window", note:"终端内跳下窗口" },
+      { mode:"t", key:"<C-k>", desc:"Go to Upper Window", note:"终端内跳上窗口" },
+      { mode:"t", key:"<C-l>", desc:"Go to Right Window", note:"终端内跳右窗口" },
+      { mode:"t", key:"<C-/>", desc:"Hide Terminal", note:"隐藏终端" },
+    ]
+  },
+  {
+    id: "edit", icon: "✍️", title: "编辑",
+    items: [
+      { mode:"n i v", key:"<A-j>", desc:"Move Down", note:"当前行 / 选区下移" },
+      { mode:"n i v", key:"<A-k>", desc:"Move Up", note:"当前行 / 选区上移" },
+      { mode:"x", key:"<", desc:"Indent Left (keep)", note:"左缩进并保持选区" },
+      { mode:"x", key:">", desc:"Indent Right (keep)", note:"右缩进并保持选区" },
+      { mode:"i", key:", . ;", desc:"Undo Breakpoint", note:"在 , . ; 处插入 undo 断点" },
+      { mode:"n", key:"gcc", desc:"Toggle Comment", note:"注释切换（内置）" },
+      { mode:"n", key:"gco", desc:"Add Comment Below", note:"在下方新增注释行" },
+      { mode:"n", key:"gcO", desc:"Add Comment Above", note:"在上方新增注释行" },
+      { mode:"i x n s", key:"<C-s>", desc:"Save File", note:"保存文件" },
+      { mode:"n", key:"<leader>K", desc:"Keywordprg", note:"用 keywordprg 查询光标词" },
+    ]
+  },
+  {
+    id: "ui", icon: "🎛️", title: "界面切换",
+    items: [
+      { mode:"n", key:"<leader>us", desc:"Spelling", note:"拼写检查" },
+      { mode:"n", key:"<leader>uw", desc:"Wrap", note:"自动换行" },
+      { mode:"n", key:"<leader>uL", desc:"Relative Number", note:"相对行号" },
+      { mode:"n", key:"<leader>ul", desc:"Line Number", note:"行号" },
+      { mode:"n", key:"<leader>ud", desc:"Diagnostics", note:"诊断显示" },
+      { mode:"n", key:"<leader>uc", desc:"Conceal Level", note:"隐藏级别" },
+      { mode:"n", key:"<leader>uA", desc:"Tabline", note:"标签栏" },
+      { mode:"n", key:"<leader>uT", desc:"Treesitter", note:"Treesitter 高亮" },
+      { mode:"n", key:"<leader>ub", desc:"Dark Background", note:"深 / 浅背景" },
+      { mode:"n", key:"<leader>uD", desc:"Dim", note:"暗化其它窗口" },
+      { mode:"n", key:"<leader>ua", desc:"Animate", note:"动画开关" },
+      { mode:"n", key:"<leader>ug", desc:"Indent", note:"缩进线" },
+      { mode:"n", key:"<leader>uS", desc:"Scroll", note:"滚动动画" },
+      { mode:"n", key:"<leader>uh", desc:"Inlay Hints", note:"内联类型提示" },
+      { mode:"n", key:"<leader>uf", desc:"Format on Save", note:"保存时格式化" },
+      { mode:"n", key:"<leader>uF", desc:"Format (notify)", note:"格式化开关（带通知）" },
+      { mode:"n", key:"<leader>uG", desc:"Git Signs", note:"Git 标志" },
+      { mode:"n", key:"<leader>un", desc:"Dismiss Notifications", note:"关闭所有通知" },
+      { mode:"n", key:"<leader>uC", desc:"Colorschemes", note:"主题选择" },
+      { mode:"n", key:"<leader>ui", desc:"Inspect Pos", note:"查看光标处高亮组" },
+      { mode:"n", key:"<leader>uI", desc:"Inspect Tree", note:"Treesitter 检视树" },
+    ]
+  },
+  {
+    id: "session", icon: "💾", title: "会话 / 退出",
+    items: [
+      { mode:"n", key:"<leader>qs", desc:"Restore Session", note:"恢复会话" },
+      { mode:"n", key:"<leader>qS", desc:"Select Session", note:"选择会话" },
+      { mode:"n", key:"<leader>ql", desc:"Restore Last Session", note:"恢复上次会话" },
+      { mode:"n", key:"<leader>qd", desc:"Don't Save Session", note:"当前会话不保存" },
+      { mode:"n", key:"<leader>qq", desc:"Quit All", note:"退出所有" },
+    ]
+  },
+  {
+    id: "ai", icon: "🤖", title: "AI · Claude Code",
+    items: [
+      { mode:"n v", key:"<leader>a", desc:"+ai（组）", note:"AI 命令组" },
+      { mode:"n", key:"<leader>ac", desc:"Toggle Claude", note:"切换 Claude 面板" },
+      { mode:"n", key:"<leader>af", desc:"Focus Claude", note:"聚焦 Claude 窗口" },
+      { mode:"n", key:"<leader>ar", desc:"Resume Claude", note:"恢复 Claude 会话（--resume）" },
+      { mode:"n", key:"<leader>aC", desc:"Continue Claude", note:"继续 Claude 会话（--continue）" },
+      { mode:"n", key:"<leader>ab", desc:"Add current buffer", note:"将当前缓冲区加入 Claude" },
+      { mode:"v", key:"<leader>as", desc:"Send to Claude", note:"发送选区到 Claude" },
+      { mode:"n", key:"<leader>as", desc:"Add file (explorer)", note:"在文件浏览器中添加文件" },
+      { mode:"n", key:"<leader>aa", desc:"Accept diff", note:"接受 Claude 的 diff" },
+      { mode:"n", key:"<leader>ad", desc:"Deny diff", note:"拒绝 Claude 的 diff" },
+    ]
+  },
+  {
+    id: "lazy", icon: "📦", title: "插件 / 消息",
+    items: [
+      { mode:"n", key:"<leader>l", desc:"Lazy", note:"打开 lazy.nvim 插件管理器" },
+      { mode:"n", key:"<leader>L", desc:"LazyVim Changelog", note:"LazyVim 更新日志" },
+      { mode:"n", key:"<leader>sn", desc:"+noice（组）", note:"Noice 消息命令组" },
+      { mode:"n", key:"<leader>snl", desc:"Noice Last Message", note:"上一条消息" },
+      { mode:"n", key:"<leader>snh", desc:"Noice History", note:"消息历史" },
+      { mode:"n", key:"<leader>sna", desc:"Noice All", note:"全部消息" },
+      { mode:"n", key:"<leader>snd", desc:"Dismiss All", note:"关闭全部消息" },
+      { mode:"n", key:"<leader>snt", desc:"Noice Picker", note:"Noice 选择器" },
+      { mode:"c", key:"<S-Enter>", desc:"Redirect Cmdline", note:"重定向命令行输出" },
+      { mode:"i n s", key:"<C-f>", desc:"Scroll Forward", note:"noice / hover 向前滚动" },
+      { mode:"i n s", key:"<C-b>", desc:"Scroll Backward", note:"noice / hover 向后滚动" },
+      { mode:"n", key:"<leader>n", desc:"Notification History", note:"通知历史" },
+    ]
+  },
+  {
+    id: "prof", icon: "⏱️", title: "性能 / 调试",
+    items: [
+      { mode:"n", key:"<leader>dpp", desc:"Toggle Profiler", note:"开关 snacks 性能分析器" },
+      { mode:"n", key:"<leader>dph", desc:"Profiler Highlights", note:"性能分析高亮" },
+      { mode:"n", key:"<leader>dps", desc:"Profiler Scratch", note:"性能分析草稿缓冲区" },
+      { mode:"n", key:"<leader>d", desc:"+debug（组）", note:"调试命令组（需启用 DAP extra）" },
+    ]
+  },
+  {
+    id: "other", icon: "⭐", title: "其它",
+    items: [
+      { mode:"n", key:"<leader>.", desc:"Toggle Scratch", note:"切换草稿缓冲区" },
+      { mode:"n", key:"<leader>S", desc:"Select Scratch", note:"选择草稿缓冲区" },
+      { mode:"n", key:"<leader>?", desc:"Buffer Keymaps", note:"显示当前缓冲区快捷键（which-key）" },
+      { mode:"n x", key:"gx", desc:"Open with system app", note:"用系统应用打开链接 / 文件" },
+      { mode:"n x", key:"<localleader>r", desc:"Run Lua", note:"运行 Lua 代码（仅 lua 文件）" },
+    ]
+  },
+  {
+    id: "dash", icon: "🚀", title: "启动页",
+    items: [
+      { mode:"n", key:"f", desc:"Find File", note:"查找文件" },
+      { mode:"n", key:"n", desc:"New File", note:"新建文件" },
+      { mode:"n", key:"g", desc:"Find Text", note:"全文搜索" },
+      { mode:"n", key:"r", desc:"Recent Files", note:"最近文件" },
+      { mode:"n", key:"c", desc:"Config", note:"查找配置文件" },
+      { mode:"n", key:"p", desc:"Projects", note:"选择项目" },
+      { mode:"n", key:"s", desc:"Restore Session", note:"恢复会话" },
+      { mode:"n", key:"x", desc:"Lazy Extras", note:"管理 Lazy Extras" },
+      { mode:"n", key:"l", desc:"Lazy", note:"打开 Lazy" },
+      { mode:"n", key:"q", desc:"Quit", note:"退出 Neovim" },
+    ]
+  },
+]
+};
+
+// ---------- render helpers ----------
+const labelMap = {Cmd:"⌘",Shift:"⇧",Ctrl:"⌃",Alt:"⌥",Option:"⌥",Enter:"↵",Up:"↑",Down:"↓",Left:"←",Right:"→",Space:"␣",Tab:"⇥",Esc:"⎋",Backspace:"⌫"};
+const mods = new Set(["Cmd","Shift","Ctrl","Alt","Option"]);
+
+function escapeHtml(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+function attrEsc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;")}
+
+function tokenClass(tok){
+  if(tok==="C-a"||tok==="C-b") return "spc";   // tmux prefix
+  if(mods.has(tok)) return "mod";
+  return "";
+}
+function renderKey(s){
+  return s.split(/\s+/).map(function(chord){
+    return chord.split("+").map(function(tok){
+      const label = labelMap[tok] || tok;
+      return '<kbd class="'+tokenClass(tok)+'">'+escapeHtml(label)+'</kbd>';
+    }).join('<span class="plus">+</span>');
+  }).join(' ');
+}
+function srcBadge(src){
+  return src==="custom"
+    ? '<span class="src-badge custom">自定义</span>'
+    : '<span class="src-badge def">默认</span>';
+}
+// ---------- nvim render helpers ----------
+const labelMapNvim = {
+  leader: "SPC", localleader: "\\", tab: "Tab", space: "Space",
+  cr: "⏎", esc: "Esc", bs: "⌫", enter: "⏎",
+  up: "↑", down: "↓", left: "←", right: "→",
+};
+const specialClass = new Set(["leader","localleader"]);
+
+function tokenize(key) {
+  const tokens = [];
+  let i = 0, buf = "";
+  const flush = () => { if (buf) { tokens.push({ t: buf, sp: false }); buf = ""; } };
+  while (i < key.length) {
+    const ch = key[i];
+    if (ch === "<") {
+      // try to match a <...> special token
+      const end = key.indexOf(">", i + 1);
+      if (end !== -1 && /^[A-Za-z0-9 _\-\/]+$/.test(key.slice(i + 1, end))) {
+        flush();
+        tokens.push({ t: key.slice(i + 1, end), sp: true });
+        i = end + 1;
+        continue;
+      }
+    }
+    buf += ch;
+    i++;
+  }
+  flush();
+  return tokens;
+}
+
+function renderKeyNvim(keyStr) {
+  // split on " / " as alternatives, render each token run, join with " / "
+  const parts = keyStr.split(" / ");
+  return parts.map(p => tokenize(p).map(tok => {
+    const label = labelMapNvim[tok.t.toLowerCase()] || tok.t;
+    const cls = tok.sp && specialClass.has(tok.t.toLowerCase()) ? ' class="spc"' :
+                tok.sp ? ' class="mod"' : "";
+    const title = tok.sp && labelMapNvim[tok.t.toLowerCase()]
+      ? ` title="${tok.t}"` : "";
+    return `<kbd${cls}${title}>${escapeHtml(label)}</kbd>`;
+  }).join("")).join('<span style="color:var(--text-mute);margin:0 4px;">/</span>');
+}
+
+function modeBadge(m) {
+  return m.split(/\s+/).map(x => `<b class="badge ${x}">${x}</b>`).join(" ");
+}
+
+
+// ---------- state ----------
+let activeTool = "wezterm";
+const navEl = document.getElementById("nav");
+const sectionsEl = document.getElementById("sections");
+const introEl = document.getElementById("intro");
+const input = document.getElementById("search");
+const emptyEl = document.getElementById("empty");
+
+function render(){
+  const cats = DATA[activeTool];
+  introEl.innerHTML = INTRO[activeTool];
+  navEl.innerHTML = "";
+  sectionsEl.innerHTML = "";
+  cats.forEach(function(cat){
+    const navItem = document.createElement("a");
+    navItem.className = "nav-item";
+    navItem.href = "#"+cat.id;
+    navItem.dataset.cat = cat.id;
+    navItem.innerHTML = '<span class="ico">'+cat.icon+'</span>'+
+      '<span class="label">'+escapeHtml(cat.title)+'</span>'+
+      '<span class="count">'+cat.items.length+'</span>';
+    navEl.appendChild(navItem);
+
+    const sec = document.createElement("section");
+    sec.className = "cat";
+    sec.id = cat.id;
+    let rows = "";
+    cat.items.forEach(function(it){
+      var isNvim = !!it.mode;
+      var keysHtml = isNvim ? renderKeyNvim(it.key) : renderKey(it.key);
+      var badgeHtml = isNvim ? '<td class="mode">'+modeBadge(it.mode)+'</td>' : '<td class="src">'+srcBadge(it.src)+'</td>';
+      rows += '<tr data-q="'+attrEsc((it.key+" "+it.desc+" "+it.note).toLowerCase())+'" data-cat="'+cat.id+'">'+
+        '<td class="keys">'+keysHtml+'</td>'+
+        badgeHtml+
+        '<td class="desc">'+escapeHtml(it.desc)+'</td>'+
+        '<td class="note">'+escapeHtml(it.note)+'</td>'+
+        '</tr>';
+    });
+    sec.innerHTML = '<div class="cat-head"><span class="emoji">'+cat.icon+'</span>'+
+      '<h2>'+escapeHtml(cat.title)+'</h2><span class="cnt">'+cat.items.length+' 项</span></div>'+
+      '<table><tbody>'+rows+'</tbody></table>';
+    sectionsEl.appendChild(sec);
+  });
+  document.getElementById("sub").textContent = activeTool === "wezterm" ? "WezTerm · macOS" : activeTool === "tmux" ? "tmux · 前缀 C-b（默认）" : "Neovim · LazyVim";
+  document.querySelectorAll("section.cat").forEach(function(s){ obs.observe(s); });
+  filter();
+}
+
+function filter(){
+  const q = input.value.trim().toLowerCase();
+  let visTotal = 0;
+  document.querySelectorAll("section.cat").forEach(function(sec){
+    let vis = 0;
+    sec.querySelectorAll("tbody tr").forEach(function(tr){
+      const m = !q || tr.dataset.q.indexOf(q) !== -1;
+      tr.classList.toggle("hidden", !m);
+      if(m) vis++;
+    });
+    visTotal += vis;
+    sec.classList.toggle("hidden", vis===0);
+    const nav = document.querySelector('.nav-item[data-cat="'+sec.id+'"]');
+    if(nav){
+      nav.classList.toggle("hidden", vis===0);
+      const cnt = nav.querySelector(".count");
+      const tot = sec.querySelectorAll("tbody tr").length;
+      if(cnt) cnt.textContent = q ? vis+"/"+tot : tot;
+    }
+  });
+  emptyEl.style.display = visTotal===0 ? "block" : "none";
+}
+
+document.querySelectorAll(".tab").forEach(function(t){
+  t.addEventListener("click", function(){
+    document.querySelectorAll(".tab").forEach(function(x){ x.classList.remove("active"); });
+    t.classList.add("active");
+    activeTool = t.dataset.tool;
+    input.value = "";
+    render();
+  });
+});
+
+const obs = new IntersectionObserver(function(entries){
+  entries.forEach(function(e){
+    if(e.isIntersecting){
+      document.querySelectorAll(".nav-item").forEach(function(n){ n.classList.toggle("active", n.dataset.cat===e.target.id); });
+    }
+  });
+}, { rootMargin:"-90px 0px -70% 0px", threshold:0 });
+
+input.addEventListener("input", filter);
+document.addEventListener("keydown", function(e){
+  if(e.key==="/" && document.activeElement !== input){ e.preventDefault(); input.focus(); }
+  else if(e.key==="Escape" && document.activeElement === input){ input.value=""; filter(); input.blur(); }
+});
+
+const root = document.documentElement;
+const themeBtn = document.getElementById("theme");
+function setTheme(t){ root.setAttribute("data-theme",t); themeBtn.textContent = t==="dark"?"🌙":"☀️"; try{localStorage.setItem("tterm-theme",t);}catch(e){} }
+themeBtn.addEventListener("click", function(){ setTheme(root.getAttribute("data-theme")==="dark"?"light":"dark"); });
+try{ const s=localStorage.getItem("tterm-theme"); if(s) setTheme(s); }catch(e){}
+
+render();
+</script>
+</body>
+</html>

@@ -175,7 +175,7 @@ const INTRO = {
 
 const DATA = {
   wezterm: [
-    { id:"wt-custom", icon:"⭐", title:"自定义键（来自 wezterm.lua）", items:[
+    { id:"wt-custom", icon:"⭐", title:"自定义键", items:[
       {src:"custom", key:"Cmd+Shift+|", desc:"SplitHorizontal", note:"左右分屏（新 pane 在右侧）"},
       {src:"custom", key:"Cmd+Shift+-", desc:"SplitVertical", note:"上下分屏（新 pane 在下方）"},
       {src:"custom", key:"Cmd+Shift+D", desc:"Smart Close", note:"智能关闭：检测到 tmux 则发 Ctrl-b d detach 保留会话，否则关闭当前 pane（带确认）"},
@@ -189,7 +189,7 @@ const DATA = {
       {src:"custom", key:"Cmd+Shift+Down", desc:"ActivatePane Down", note:"方向键跳到下 pane"},
       {src:"custom", key:"Shift+Enter", desc:"Send Shift+Enter", note:"修复 claude code 中 Shift+Enter 换行（发送特殊转义序列）"},
     ]},
-    { id:"wt-tab", icon:"🗂️", title:"默认 · 标签页与窗口", items:[
+    { id:"wt-tab", icon:"🗂️", title:"标签页 / 窗口", items:[
       {src:"def", key:"Cmd+T", desc:"SpawnTab", note:"新建标签页"},
       {src:"def", key:"Cmd+W", desc:"CloseCurrentTab", note:"关闭当前标签页（带确认）"},
       {src:"def", key:"Cmd+N", desc:"SpawnWindow", note:"新建窗口"},
@@ -199,7 +199,7 @@ const DATA = {
       {src:"def", key:"Cmd+}", desc:"ActivateTabRelative(1)", note:"下一个标签（即 Cmd+Shift+]）"},
       {src:"def", key:"Cmd+Q", desc:"QuitApplication", note:"退出 WezTerm"},
     ]},
-    { id:"wt-font", icon:"🔤", title:"默认 · 字体与显示", items:[
+    { id:"wt-font", icon:"🔤", title:"字体 / 显示", items:[
       {src:"def", key:"Cmd+=", desc:"IncreaseFontSize", note:"放大字体"},
       {src:"def", key:"Cmd+-", desc:"DecreaseFontSize", note:"缩小字体"},
       {src:"def", key:"Cmd+0", desc:"ResetFontSize", note:"重置字体大小"},
@@ -207,7 +207,7 @@ const DATA = {
       {src:"def", key:"Alt+Enter", desc:"ToggleFullScreen", note:"全屏切换"},
       {src:"def", key:"Ctrl+Shift+Z", desc:"TogglePaneZoom", note:"当前 pane 缩放（最大化/还原）"},
     ]},
-    { id:"wt-copy", icon:"📋", title:"默认 · 复制 / 粘贴 / 搜索", items:[
+    { id:"wt-copy", icon:"📋", title:"复制 / 粘贴 / 搜索", items:[
       {src:"def", key:"Cmd+C", desc:"CopyTo Clipboard", note:"复制选区（选中也会自动复制）"},
       {src:"def", key:"Cmd+V", desc:"PasteFrom Clipboard", note:"粘贴"},
       {src:"def", key:"Cmd+F", desc:"Search", note:"搜索"},
@@ -215,7 +215,7 @@ const DATA = {
       {src:"def", key:"Ctrl+Shift+U", desc:"CharSelect", note:"字符选择（输入 Unicode / emoji）"},
       {src:"def", key:"Ctrl+Shift+P", desc:"CommandPalette", note:"命令面板"},
     ]},
-    { id:"wt-cm", icon:"📝", title:"复制模式内（Ctrl+Shift+X 进入，vi 风格）", items:[
+    { id:"wt-cm", icon:"📝", title:"复制模式（vi）", items:[
       {src:"def", key:"h", desc:"MoveLeft", note:"左移"},
       {src:"def", key:"j", desc:"MoveDown", note:"下移"},
       {src:"def", key:"k", desc:"MoveUp", note:"上移"},
@@ -238,7 +238,7 @@ const DATA = {
       {src:"def", key:"f", desc:"JumpForward", note:"跳到指定字符（f+x）"},
       {src:"def", key:"F", desc:"JumpBackward", note:"反向跳字符"},
     ]},
-    { id:"wt-other", icon:"⚙️", title:"默认 · 其它", items:[
+    { id:"wt-other", icon:"⚙️", title:"其它", items:[
       {src:"def", key:"Cmd+R", desc:"ReloadConfiguration", note:"重新加载配置"},
       {src:"def", key:"Cmd+H", desc:"HideApplication", note:"隐藏应用"},
       {src:"def", key:"Cmd+M", desc:"Hide", note:"最小化"},

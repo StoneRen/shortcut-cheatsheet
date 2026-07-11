@@ -159,7 +159,7 @@ const INTRO = {
   nvim: `<div class="intro">
     基于 <b>LazyVim</b> 默认配置 + 本地自定义（透明 tokyonight、自动换行等）。
     <code>&lt;leader&gt;</code> = <b>空格键 (Space)</b>，<code>&lt;localleader&gt;</code> = <b>&#92;</b>。
-    大部分快捷键来源于 LazyVim，使用 <b>snacks.nvim</b> 作为 picker / explorer，<b>blink.cmp</b> 补全，<b>claudecode.nvim</b> 提供 AI。
+    大部分快捷键来源于 LazyVim，使用 <b>snacks.nvim</b> 作为 picker / explorer，<b>blink.cmp</b> 补全，<b>claudecode.nvim</b> 提供 AI；<b>Git Difftool</b> 记录 Neovim 内置两栏 diff 操作。
     <div class="legend">
       <span><b class="badge n">n</b> 普通</span>
       <span><b class="badge x">x</b> 可视</span>
@@ -495,6 +495,23 @@ const DATA = {
       { mode:"n", key:"<leader>ghd", desc:"Diff This", note:"当前 buffer 进入 diff" },
       { mode:"n", key:"<leader>ghD", desc:"Diff This ~", note:"与上次提交 diff" },
       { mode:"o x", key:"ih", desc:"Select Hunk", note:"选择 hunk（文本对象）" },
+    ]
+  },
+  {
+    id: "difftool", icon: "🧩", title: "Git Difftool / Diff 模式",
+    items: [
+      { mode:"n", key:"<C-h> / <C-l>", desc:"Switch Diff Window", note:"左右切换两栏 diff 窗口；通常左侧旧版本，右侧新/工作区，以窗口标题为准" },
+      { mode:"n", key:"<C-j> / <C-k>", desc:"Switch Window", note:"上下切换窗口；若 difftool 外层还有其它分屏时使用" },
+      { mode:"n", key:"]c", desc:"Next Difference", note:"跳到下一个差异块；可加次数如 3]c" },
+      { mode:"n", key:"[c", desc:"Previous Difference", note:"跳到上一个差异块；可加次数如 3[c" },
+      { mode:"n", key:"do / :diffget", desc:"Get Difference", note:"把另一侧窗口的当前差异取到当前 buffer" },
+      { mode:"n", key:"dp / :diffput", desc:"Put Difference", note:"把当前 buffer 的当前差异推到另一侧窗口" },
+      { mode:"n", key:"zo / zc", desc:"Open / Close Fold", note:"展开 / 折叠当前 diff 上下文" },
+      { mode:"n", key:"zR / zM", desc:"Open / Close All Folds", note:"展开全部 / 折叠全部 diff 上下文" },
+      { mode:"n", key:":diffupdate / <leader>ur", desc:"Update Diff", note:"手动刷新 diff 计算；画面或差异显示不对时用" },
+      { mode:"c", key:":wqa", desc:"Write and Quit All", note:"保存所有窗口并退出 difftool" },
+      { mode:"c", key:":qa!", desc:"Quit All Without Saving", note:"放弃本次 difftool 中的改动并退出" },
+      { mode:"c", key:":h diff-mode", desc:"Diff Help", note:"查看 Neovim 内置 diff 模式帮助" },
     ]
   },
   {

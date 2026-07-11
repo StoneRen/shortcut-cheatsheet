@@ -28,7 +28,8 @@
 - 配置目录：`~/.config/nvim`（LazyVim，含 `lua/`、`lazy-lock.json`、`lazyvim.json`）
 - 默认键来源：已安装 LazyVim 源码 `LazyVim/lua/lazyvim/**` 的 keymap 定义
 - 插件键来源：`lazy-lock.json` 中锁定的插件各自定义的 keymap（snacks.nvim、blink.cmp、claudecode.nvim、gitsigns、flash、which-key 等）
-- 生成方式：读取上述源码中的 `vim.keymap.set` 与 LazyVim/插件的 `keys` spec，按分类归整；每条标注 `mode`（n / x / v / i / o / c / t / s，可多值空格分隔）
+- 内置命令来源：本机 Neovim runtime help（如 `:help diff-mode` / `:help copy-diffs`），仅用于记录 `git difftool` 进入两栏 diff 后的 Neovim 内置 diff 操作（如 `]c` / `[c` / `do` / `dp`）
+- 生成方式：读取上述源码中的 `vim.keymap.set` 与 LazyVim/插件的 `keys` spec，并读取 Neovim 内置 help 中的 diff-mode 操作，按分类归整；每条标注 `mode`（n / x / v / i / o / c / t / s，可多值空格分隔）
 - `leader` = `<Space>`，`localleader` = `\`
 
 ## 数据结构约定
